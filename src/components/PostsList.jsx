@@ -5,47 +5,42 @@ import Modal from './Modal';
 import classes from './PostsList.module.css';
 // import PhotoCollection from '../photos/PhotoCollection';
 
-function PostsList({isPosting})
+function PostsList({isPosting, onStopPosting})
 {
-    
-    const[enteredBody, setEnteredBody] = useState('');
-    const[enteredAuthor, setEnteredAuthor] = useState('');
+    const[posts, setPosts] = useState([]);
 
-
-    function bodyChangeHandler(event)
+    function addPostHandler(postData)
     {
-        setEnteredBody(event.target.value);
-    }
-
-    function authorChangeHandler(event)
-    {
-        setEnteredAuthor(event.target.value);
-    }
-
-    let modalContent;
-
-    if(modalIsVisible)
-    {
-        modalContent = (
-            <Modal onClose = {hideModalHandler}>
-            <NewPost 
-                onBodyChange = {bodyChangeHandler} 
-                onAuthorChange = {authorChangeHandler}
-            />
-            </Modal>
-        );
+        setPosts((existingPosts) => [postData, ...existingPosts]);
     }
 
     return (
         <>
-            {isPosting && (
+            {/* {isPosting && (
                 {modalContent}
+            )} */}
+
+            {isPosting && (
+                <Modal onClose = {onStopPosting}>
+                    <NewPost 
+                        onCancel = {onStopPosting} onAddPost = {addPostHandler}
+                    />
+                </Modal>
             )}
             
-            <ul className = {classes.posts}>
-                <Post author = {enteredAuthor} body = {enteredBody} />
-                <Post author = "min" body = "awesome"/>
-            </ul>
+            {posts.length > 0 && (
+                <ul className = {classes.posts}>
+                    {posts.map((post) => <Post key = {post.body} author = {post.author} body = {post.body}/>)}
+                </ul>
+            )}
+
+            {posts.length === 0 && (
+                <div style = {{textAlign: 'center', color: 'white'}}>
+                    <h2>There are no posts yet.</h2>
+                    <p>Start adding some ! </p>
+                </div>
+            )}
+
             {/* <PhotoCollection/> */}
         </>
     );
